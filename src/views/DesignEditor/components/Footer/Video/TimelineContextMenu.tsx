@@ -7,6 +7,7 @@ import { findSceneIndexByTime, getMaxTime } from "~/views/DesignEditor/utils/sce
 import { useTimer } from "@layerhub-io/use-timer"
 import { getDefaultTemplate } from "~/constants/design-editor"
 import { useEditor, useFrame } from "@layerhub-io/react"
+import { cloneDeep } from "lodash"
 
 export default function () {
   const { time, setTime } = useTimer()
@@ -17,6 +18,7 @@ export default function () {
     contextMenuTimelineRequest,
     setCurrentScene,
     setCurrentDesign,
+    hoverTime,
   } = useDesignEditorContext()
   const ref = React.useRef<HTMLDivElement | null>(null)
   const editor = useEditor()
@@ -65,14 +67,34 @@ export default function () {
     }
   }
 
-  const makeAddScene = () => {}
-
   const makeDuplicateScene = () => {
     const currentScene = scenes.find((scene) => scene.id === contextMenuTimelineRequest.id)
+    console.log(currentScene);
     const updatedScenes = [...scenes, { ...currentScene, id: nanoid() }]
     //  @ts-ignore
     setScenes(updatedScenes)
     setContextMenuTimelineRequest({ ...contextMenuTimelineRequest, visible: false })
+  }
+
+  const makeSplitScene = () => {
+    const clonedScenes = cloneDeep(scenes)
+    const currentSceneIndex = clonedScenes.findIndex((scene) => scene.id === contextMenuTimelineRequest.id)
+    const obj = clonedScenes[currentSceneIndex]
+    // perform split action after getting the hover or seek data
+    if ((obj?.duration)) {
+      let hoverT = Number((hoverTime).toFixed(0))
+      clonedScenes.splice(currentSceneIndex, 1, { ...obj, id: nanoid(), duration: hoverT }, {
+        id: nanoid(),
+        frame: obj.frame,
+        layers: obj.layers,
+        metadata: {},
+        preview: obj.preview,
+        duration: obj?.duration - hoverT
+      })
+      setCurrentScene(clonedScenes[currentSceneIndex])
+      setScenes(clonedScenes)
+      setContextMenuTimelineRequest({ ...contextMenuTimelineRequest, visible: false })
+    }
   }
 
   return (
@@ -120,6 +142,22 @@ export default function () {
         }}
       >
         Delete Scene
+      </Block>
+      <Block
+        onClick={makeSplitScene}
+        $style={{
+          fontSize: "14px",
+          height: "28px",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 1rem",
+          ":hover": {
+            backgroundColor: "rgba(0,0,0,0.1)",
+            cursor: "pointer",
+          },
+        }}
+      >
+        Split Scene
       </Block>
     </Block>
   )

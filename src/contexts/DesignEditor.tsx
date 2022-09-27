@@ -1,6 +1,6 @@
 import { IScene } from "@layerhub-io/types"
 import React from "react"
-import {ContextMenuSceneRequest, ContextMenuTimelineRequest, DesignType, IDesign} from "~/interfaces/DesignEditor"
+import { ContextMenuSceneRequest, ContextMenuTimelineRequest, DesignType, IDesign } from "~/interfaces/DesignEditor"
 
 interface ISceneEditorContext {
   scenes: IScene[]
@@ -25,13 +25,15 @@ interface ISceneEditorContext {
   setContextMenuTimelineRequest: React.Dispatch<React.SetStateAction<ContextMenuTimelineRequest>>
   contextMenuSceneRequest: ContextMenuTimelineRequest
   setContextMenuSceneRequest: React.Dispatch<React.SetStateAction<ContextMenuTimelineRequest>>
+  hoverTime: number,
+  SetHoverTime: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const DesignEditorContext = React.createContext<ISceneEditorContext>({
   scenes: [],
-  setScenes: () => {},
+  setScenes: () => { },
   currentScene: null,
-  setCurrentScene: () => {},
+  setCurrentScene: () => { },
   currentDesign: {
     id: "",
     frame: {
@@ -44,34 +46,35 @@ export const DesignEditorContext = React.createContext<ISceneEditorContext>({
     scenes: [],
     type: "",
   },
-  setCurrentDesign: () => {},
+  setCurrentDesign: () => { },
   isSidebarOpen: true,
-  setIsSidebarOpen: () => {},
+  setIsSidebarOpen: () => { },
   editorType: "NONE",
-  setEditorType: () => {},
+  setEditorType: () => { },
   displayPlayback: false,
-  setDisplayPlayback: () => {},
+  setDisplayPlayback: () => { },
   displayPreview: false,
-  setDisplayPreview: () => {},
+  setDisplayPreview: () => { },
   currentPreview: "",
-  setCurrentPreview: () => {},
+  setCurrentPreview: () => { },
   maxTime: 0,
-  setMaxTime: () => {},
+  setMaxTime: () => { },
   contextMenuTimelineRequest: {
     id: "",
     left: 0,
     top: 0,
     visible: false,
   },
-  setContextMenuTimelineRequest: () => {},
+  setContextMenuTimelineRequest: () => { },
   contextMenuSceneRequest: {
     id: "",
     left: 0,
     top: 0,
     visible: false,
   },
-  setContextMenuSceneRequest: () => {},
-
+  setContextMenuSceneRequest: () => { },
+  hoverTime: 0,
+  SetHoverTime: () => { }
 })
 
 export const DesignEditorProvider = ({ children }: { children: React.ReactNode }) => {
@@ -107,6 +110,8 @@ export const DesignEditorProvider = ({ children }: { children: React.ReactNode }
     top: 0,
     visible: false,
   })
+  const [hoverTime, SetHoverTime] = React.useState<number>(0)
+
   const context = {
     scenes,
     setScenes,
@@ -130,6 +135,8 @@ export const DesignEditorProvider = ({ children }: { children: React.ReactNode }
     setContextMenuTimelineRequest,
     contextMenuSceneRequest,
     setContextMenuSceneRequest,
+    hoverTime,
+    SetHoverTime
   }
   return <DesignEditorContext.Provider value={context}>{children}</DesignEditorContext.Provider>
 }

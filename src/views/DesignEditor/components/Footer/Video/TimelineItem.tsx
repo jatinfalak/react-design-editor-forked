@@ -40,7 +40,7 @@ const RightHandle = ({ isHover, setControlHover }: { isHover: boolean; setContro
 
 export default function ({ item, makeResizeTimelineItem, width, preview, frame, duration, isCurrentScene }: any) {
   const timeLineItemRef = React.useRef<HTMLDivElement>(null)
-  const { setContextMenuTimelineRequest } = useDesignEditorContext()
+  const { setContextMenuTimelineRequest, SetHoverTime } = useDesignEditorContext()
   const [markerRefPosition, setMarkerRefPosition] = React.useState({ y: 0 })
   const { setTime } = useTimer()
   const scenes = useDesignEditorScenes()
@@ -75,14 +75,15 @@ export default function ({ item, makeResizeTimelineItem, width, preview, frame, 
   const refBoundingRect = timeLineItemRef.current?.getBoundingClientRect()
 
   const setTimeByMarker = React.useCallback(
-    (id: string, change: number) => {
+    (id: string, change: number, applyToSeek = true) => {
       const currentIndex = scenes.findIndex((scn) => scn.id === id)
       if (currentIndex > -1) {
         const prevScenes = scenes.slice(0, currentIndex)
         const prevDuration = prevScenes.reduce(function (previousVal, currentValue) {
           return previousVal + currentValue.duration!
         }, 0)
-        setTime(prevDuration + change)
+        if (applyToSeek) setTime(prevDuration + change)
+        SetHoverTime(change)
       }
     },
     [scenes]
@@ -131,7 +132,10 @@ export default function ({ item, makeResizeTimelineItem, width, preview, frame, 
       <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
         <div onMouseMove={onMouseMoveItem} ref={timeLineItemRef}>
           <div
-            onMouseEnter={() => setOptions({ ...options, isItemHover: true })}
+            onMouseEnter={() => {
+              setOptions({ ...options, isItemHover: true })
+              setTimeByMarker(item.id, markerRefPosition.y * 40, false)
+            }}
             onMouseLeave={() => setOptions({ ...options, isItemHover: false, isControlHover: false })}
             style={{
               background: "#ffffff",

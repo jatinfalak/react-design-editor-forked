@@ -21,6 +21,8 @@ function useDesignEditorContext() {
     setContextMenuSceneRequest,
     currentDesign,
     setCurrentDesign,
+    hoverTime,
+    SetHoverTime
   } = useContext(DesignEditorContext)
   return {
     editorType,
@@ -41,6 +43,8 @@ function useDesignEditorContext() {
     setContextMenuSceneRequest,
     currentDesign,
     setCurrentDesign,
+    hoverTime,
+    SetHoverTime
   }
 }
 
